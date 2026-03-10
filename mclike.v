@@ -22,13 +22,48 @@ mut:
 	keys        map[gg.KeyCode]bool
 }
 
+fn check_collision(mut game Game, x f32, y f32) bool {
+	// Player size is 20x20, centered at player_x, player_y
+	// We check the 4 corners of the player bounding box
+	corners := [
+		[x - 9.0, y - 9.0],
+		[x + 9.0, y - 9.0],
+		[x - 9.0, y + 9.0],
+		[x + 9.0, y + 9.0]
+	]
+
+	for corner in corners {
+		cx := int(math.floor(corner[0] / f32(world.block_size)))
+		cy := int(math.floor(corner[1] / f32(world.block_size)))
+
+		if game.world.get_block(cx, cy, 1) > 0 {
+			return true // Collision with a solid block (layer 1)
+		}
+	}
+
+	return false
+}
+
 fn frame(mut game Game) {
 	// Movement
 	speed := f32(4.0)
-	if game.keys[.w] { game.player_y -= speed }
-	if game.keys[.s] { game.player_y += speed }
-	if game.keys[.a] { game.player_x -= speed }
-	if game.keys[.d] { game.player_x += speed }
+
+	mut new_x := game.player_x
+	mut new_y := game.player_y
+
+	if game.keys[.w] || game.keys[.up] { new_y -= speed }
+	if game.keys[.s] || game.keys[.down] { new_y += speed }
+	if game.keys[.a] || game.keys[.left] { new_x -= speed }
+	if game.keys[.d] || game.keys[.right] { new_x += speed }
+
+	// Apply X movement if no collision
+	if !check_collision(mut game, new_x, game.player_y) {
+		game.player_x = new_x
+	}
+	// Apply Y movement if no collision
+	if !check_collision(mut game, game.player_x, new_y) {
+		game.player_y = new_y
+	}
 
 	game.gg.begin()
 
