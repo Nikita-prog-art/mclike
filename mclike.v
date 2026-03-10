@@ -4,6 +4,7 @@ import gg
 import core
 import world
 import registry
+import math
 
 const win_width = 800
 const win_height = 600
@@ -32,13 +33,13 @@ fn frame(mut game Game) {
 	game.gg.begin()
 
 	// Draw world
-	camera_x := game.player_x - win_width / 2
-	camera_y := game.player_y - win_height / 2
+	camera_x := int(math.floor(game.player_x - win_width / 2))
+	camera_y := int(math.floor(game.player_y - win_height / 2))
 
-	start_x := int(camera_x / world.block_size) - 1
-	start_y := int(camera_y / world.block_size) - 1
-	end_x := start_x + (win_width / world.block_size) + 2
-	end_y := start_y + (win_height / world.block_size) + 2
+	start_x := int(math.floor(f32(camera_x) / f32(world.block_size))) - 1
+	start_y := int(math.floor(f32(camera_y) / f32(world.block_size))) - 1
+	end_x := start_x + (win_width / world.block_size) + 3
+	end_y := start_y + (win_height / world.block_size) + 3
 
 	for layer in 0 .. 2 {
 		for y in start_y .. end_y {
@@ -55,7 +56,8 @@ fn frame(mut game Game) {
 					screen_x := (x * world.block_size) - camera_x
 					screen_y := (y * world.block_size) - camera_y
 
-					game.gg.draw_rect_filled(f32(screen_x), f32(screen_y), f32(world.block_size), f32(world.block_size), color)
+					// Adding +1 to block size to prevent white lines/tearing due to sub-pixel rendering or floating point inaccuracies
+					game.gg.draw_rect_filled(f32(screen_x), f32(screen_y), f32(world.block_size + 1), f32(world.block_size + 1), color)
 				}
 			}
 		}
@@ -77,11 +79,11 @@ fn on_event(e &gg.Event, mut game Game) {
 	} else if e.typ == .key_up {
 		game.keys[e.key_code] = false
 	} else if e.typ == .mouse_down {
-		camera_x := game.player_x - win_width / 2
-		camera_y := game.player_y - win_height / 2
+		camera_x := int(math.floor(game.player_x - win_width / 2))
+		camera_y := int(math.floor(game.player_y - win_height / 2))
 
-		world_x := int((e.mouse_x + camera_x) / world.block_size)
-		world_y := int((e.mouse_y + camera_y) / world.block_size)
+		world_x := int(math.floor(f32(e.mouse_x + camera_x) / f32(world.block_size)))
+		world_y := int(math.floor(f32(e.mouse_y + camera_y) / f32(world.block_size)))
 
 		if e.mouse_button == .left {
 			// Mine block
