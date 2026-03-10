@@ -5,12 +5,11 @@ pub:
     id          int
     name        string
     is_solid    bool
-    texture_idx int
-    // Сюда можно добавить функции-коллбеки для модов (например, on_interact)
+    color       int
 }
 
 pub struct BlockRegistry {
-mut:
+pub mut:
     blocks []Block
     by_name map[string]int
 }
