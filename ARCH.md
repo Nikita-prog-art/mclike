@@ -1,7 +1,5 @@
 # Architecture Document: mclike
 
-Отличный выбор языка. **Vlang (V)** идеально подходит для создания производительных 2D-игр благодаря быстрой компиляции, высокой производительности (на уровне C) и встроенным графическим библиотекам (например, модулям `gg` и `sokol`).
-
 This document outlines the architecture for a top-down, extensible 2D game incorporating Minecraft-like mechanics and support for AI agents as fully privileged actors. The game is written in Vlang (V) for high performance and fast compilation, leveraging graphics modules such as `gg`.
 
 ## 1. Core Paradigm: Actor-Controller and ECS
@@ -39,6 +37,7 @@ pub:
     name        string
     is_solid    bool
     color       gg.Color
+    // Сюда можно добавить функции-коллбеки для модов (например, on_interact)
 }
 
 pub struct BlockRegistry {
