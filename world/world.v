@@ -14,11 +14,16 @@ pub mut:
 
 pub struct World {
 pub mut:
-    chunks map[string]&Chunk
+    chunks map[u64]&Chunk
+}
+
+@[inline]
+pub fn get_chunk_key(cx int, cy int) u64 {
+    return (u64(u32(cx)) << 32) | u64(u32(cy))
 }
 
 pub fn (mut w World) get_chunk(cx int, cy int) &Chunk {
-    key := '${cx},${cy}'
+    key := get_chunk_key(cx, cy)
     if key !in w.chunks {
         mut c := &Chunk{x: cx, y: cy}
         for i in 0 .. chunk_size {
@@ -37,8 +42,8 @@ pub fn (mut w World) get_chunk(cx int, cy int) &Chunk {
 }
 
 pub fn (mut w World) get_block(x int, y int, layer int) int {
-    cx := if x < 0 { int(math.floor(f32(x) / f32(chunk_size))) } else { x / chunk_size }
-    cy := if y < 0 { int(math.floor(f32(y) / f32(chunk_size))) } else { y / chunk_size }
+    cx := x >> 4
+    cy := y >> 4
 
     mut bx := x % chunk_size
     mut by := y % chunk_size
@@ -50,8 +55,8 @@ pub fn (mut w World) get_block(x int, y int, layer int) int {
 }
 
 pub fn (mut w World) set_block(x int, y int, layer int, block_id int) {
-    cx := if x < 0 { int(math.floor(f32(x) / f32(chunk_size))) } else { x / chunk_size }
-    cy := if y < 0 { int(math.floor(f32(y) / f32(chunk_size))) } else { y / chunk_size }
+    cx := x >> 4
+    cy := y >> 4
 
     mut bx := x % chunk_size
     mut by := y % chunk_size

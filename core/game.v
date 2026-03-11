@@ -39,8 +39,8 @@ pub fn check_collision(mut game Game, x f32, y f32) bool {
 	]
 
 	for corner in corners {
-		cx := int(math.floor(corner[0] / f32(world.block_size)))
-		cy := int(math.floor(corner[1] / f32(world.block_size)))
+		cx := int(corner[0]) >> 5
+		cy := int(corner[1]) >> 5
 
 		if game.world.get_block(cx, cy, 1) > 0 {
 			return true // Collision with a solid block (layer 1)
@@ -81,11 +81,11 @@ pub fn frame(mut game Game) {
 	game.gg.begin()
 
 	// Draw world
-	camera_x := int(math.floor(game.player_x - win_width / 2))
-	camera_y := int(math.floor(game.player_y - win_height / 2))
+	camera_x := int(game.player_x) - win_width / 2
+	camera_y := int(game.player_y) - win_height / 2
 
-	start_x := int(math.floor(f32(camera_x) / f32(world.block_size))) - 1
-	start_y := int(math.floor(f32(camera_y) / f32(world.block_size))) - 1
+	start_x := (camera_x >> 5) - 1
+	start_y := (camera_y >> 5) - 1
 	end_x := start_x + (win_width / world.block_size) + 3
 	end_y := start_y + (win_height / world.block_size) + 3
 
@@ -151,11 +151,11 @@ pub fn on_event(e &gg.Event, mut game Game) {
 	} else if e.typ == .key_up {
 		game.keys[e.key_code] = false
 	} else if e.typ == .mouse_down {
-		camera_x := int(math.floor(game.player_x - win_width / 2))
-		camera_y := int(math.floor(game.player_y - win_height / 2))
+		camera_x := int(game.player_x) - win_width / 2
+		camera_y := int(game.player_y) - win_height / 2
 
-		world_x := int(math.floor(f32(e.mouse_x + camera_x) / f32(world.block_size)))
-		world_y := int(math.floor(f32(e.mouse_y + camera_y) / f32(world.block_size)))
+		world_x := int(e.mouse_x + f32(camera_x)) >> 5
+		world_y := int(e.mouse_y + f32(camera_y)) >> 5
 
 		if e.mouse_button == .left {
 			// Mine block
