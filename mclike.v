@@ -183,7 +183,7 @@ fn on_event(e &gg.Event, mut game Game) {
 						vx: (rand.f32() - 0.5) * 8.0
 						vy: (rand.f32() - 0.5) * 8.0
 						life: rand.int_in_range(20, 40) or { 30 }
-						size: rand.f32() * 6.0 + 2.0
+						size: rand.f32() * 3.0 + 1.0
 						color: color
 					}
 				}
