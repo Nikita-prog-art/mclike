@@ -23,10 +23,10 @@ pub fn (mut w World) get_chunk(cx int, cy int) &Chunk {
         mut c := &Chunk{x: cx, y: cy}
         for i in 0 .. chunk_size {
             for j in 0 .. chunk_size {
-                c.layers[0][i][j] = 1 // 1 for grass
+                c.layers[0][i][j] = 2 // 2 for grass block
                 if i == 0 || j == 0 || i == chunk_size - 1 || j == chunk_size - 1 {
                     if cx == 0 && cy == 0 {
-                        c.layers[1][i][j] = 2 // 2 for wall
+                        c.layers[1][i][j] = 1 // 1 for stone wall
                     }
                 }
             }

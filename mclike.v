@@ -90,13 +90,8 @@ fn frame(mut game Game) {
 		for y in start_y .. end_y {
 			for x in start_x .. end_x {
 				block_id := game.world.get_block(x, y, layer)
-				if block_id > 0 {
-					mut color := gg.Color{r: 0, g: 0, b: 0, a: 255}
-					if block_id == 1 { // grass
-						color = gg.Color{r: 34, g: 139, b: 34, a: 255}
-					} else if block_id == 2 { // wall
-						color = gg.Color{r: 128, g: 128, b: 128, a: 255}
-					}
+				if block_id > 0 && block_id < game.registry.blocks.len {
+					color := game.registry.blocks[block_id].color
 
 					screen_x := (x * world.block_size) - camera_x
 					screen_y := (y * world.block_size) - camera_y
