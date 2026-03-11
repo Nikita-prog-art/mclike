@@ -9,7 +9,7 @@ pub struct Chunk {
 pub mut:
     x int
     y int
-    layers [3][chunk_size][chunk_size]int
+    layers [2][chunk_size][chunk_size]int
 }
 
 pub struct World {

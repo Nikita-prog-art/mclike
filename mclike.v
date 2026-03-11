@@ -5,9 +5,21 @@ import core
 import world
 import registry
 import math
+import rand
 
 const win_width = 800
 const win_height = 600
+
+struct Particle {
+mut:
+	x     f32
+	y     f32
+	vx    f32
+	vy    f32
+	life  int
+	size  f32
+	color gg.Color
+}
 
 struct Game {
 mut:
@@ -22,6 +34,8 @@ mut:
 	keys        map[gg.KeyCode]bool
 
 	selected_block int = 1
+
+	particles   []Particle
 }
 
 fn check_collision(mut game Game, x f32, y f32) bool {
@@ -104,25 +118,22 @@ fn frame(mut game Game) {
 		}
 	}
 
-	// Draw player
-	game.gg.draw_rect_filled(win_width / 2 - 10, win_height / 2 - 10, 20, 20, gg.Color{r: 255, g: 0, b: 0, a: 255})
+	// Update and draw particles
+	mut next_particles := []Particle{}
+	for mut p in game.particles {
+		p.x += p.vx
+		p.y += p.vy
+		p.life--
 
-	// Draw ceiling (layer 2)
-	for layer in 2 .. 3 {
-		for y in start_y .. end_y {
-			for x in start_x .. end_x {
-				block_id := game.world.get_block(x, y, layer)
-				if block_id > 0 && block_id < game.registry.blocks.len {
-					color := game.registry.blocks[block_id].color
-
-					screen_x := (x * world.block_size) - camera_x
-					screen_y := (y * world.block_size) - camera_y
-
-					game.gg.draw_rect_filled(f32(screen_x), f32(screen_y), f32(world.block_size), f32(world.block_size), color)
-				}
-			}
+		if p.life > 0 {
+			next_particles << *p
+			game.gg.draw_rect_filled(p.x - f32(camera_x), p.y - f32(camera_y), p.size, p.size, p.color)
 		}
 	}
+	game.particles = next_particles
+
+	// Draw player
+	game.gg.draw_rect_filled(win_width / 2 - 10, win_height / 2 - 10, 20, 20, gg.Color{r: 255, g: 0, b: 0, a: 255})
 
 	// Draw currently selected block
 	if game.selected_block > 0 && game.selected_block < game.registry.blocks.len {
@@ -159,17 +170,30 @@ fn on_event(e &gg.Event, mut game Game) {
 
 		if e.mouse_button == .left {
 			// Mine block
-			target_layer := if game.keys[.left_shift] || game.keys[.right_shift] { 2 } else { 1 }
-			if game.world.get_block(world_x, world_y, target_layer) > 0 {
-				game.world.set_block(world_x, world_y, target_layer, 0)
+			block_id := game.world.get_block(world_x, world_y, 1)
+			if block_id > 0 {
+				color := game.registry.blocks[block_id].color
+				game.world.set_block(world_x, world_y, 1, 0)
+
+				// Spawn particles
+				for _ in 0 .. 15 {
+					game.particles << Particle{
+						x: f32(world_x * world.block_size) + rand.f32() * f32(world.block_size)
+						y: f32(world_y * world.block_size) + rand.f32() * f32(world.block_size)
+						vx: (rand.f32() - 0.5) * 2.0
+						vy: (rand.f32() - 0.5) * 2.0
+						life: rand.int_in_range(20, 40) or { 30 }
+						size: rand.f32() * 3.0 + 1.0
+						color: color
+					}
+				}
 			}
 		} else if e.mouse_button == .right {
 			// Place block
-			target_layer := if game.keys[.left_shift] || game.keys[.right_shift] { 2 } else { 1 }
-			if game.world.get_block(world_x, world_y, target_layer) == 0 {
+			if game.world.get_block(world_x, world_y, 1) == 0 {
 				if game.selected_block < game.registry.blocks.len {
-					if target_layer == 2 || game.registry.blocks[game.selected_block].is_solid {
-						game.world.set_block(world_x, world_y, target_layer, game.selected_block)
+					if game.registry.blocks[game.selected_block].is_solid {
+						game.world.set_block(world_x, world_y, 1, game.selected_block)
 					} else {
 						game.world.set_block(world_x, world_y, 0, game.selected_block)
 					}
