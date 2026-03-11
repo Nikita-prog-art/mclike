@@ -181,7 +181,7 @@ fn on_event(e &gg.Event, mut game Game) {
 						x: f32(world_x * world.block_size) + rand.f32() * f32(world.block_size)
 						y: f32(world_y * world.block_size) + rand.f32() * f32(world.block_size)
 						vx: (rand.f32() - 0.5) * 8.0
-						vy: (rand.f32() - 0.5) * 8.0 - 2.0
+						vy: (rand.f32() - 0.5) * 8.0
 						life: rand.int_in_range(20, 40) or { 30 }
 						size: rand.f32() * 6.0 + 2.0
 						color: color
