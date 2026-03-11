@@ -123,7 +123,6 @@ fn frame(mut game Game) {
 	for mut p in game.particles {
 		p.x += p.vx
 		p.y += p.vy
-		p.vy += 0.5 // Gravity
 		p.life--
 
 		if p.life > 0 {
