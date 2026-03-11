@@ -26,13 +26,13 @@ mut:
 
 fn check_collision(mut game Game, x f32, y f32) bool {
 	// Player size is 20x20, centered at player_x, player_y
-	// We check the 4 corners of the player bounding box
-	// We inset the corners slightly so it doesn't snag exactly on pixel edges
+	// Block size is 32x32.
+	// We use precise coordinates. Since player is 20x20 centered, its coordinates are [-10, +10]
 	corners := [
-		[x - 8.0, y - 8.0],
-		[x + 8.0, y - 8.0],
-		[x - 8.0, y + 8.0],
-		[x + 8.0, y + 8.0]
+		[x - 10.0, y - 10.0],
+		[x + 10.0, y - 10.0],
+		[x - 10.0, y + 10.0],
+		[x + 10.0, y + 10.0]
 	]
 
 	for corner in corners {
@@ -101,8 +101,9 @@ fn frame(mut game Game) {
 					screen_x := (x * world.block_size) - camera_x
 					screen_y := (y * world.block_size) - camera_y
 
-					// Adding +1 to block size to prevent white lines/tearing due to sub-pixel rendering or floating point inaccuracies
-					game.gg.draw_rect_filled(f32(screen_x), f32(screen_y), f32(world.block_size + 1), f32(world.block_size + 1), color)
+					// Use exact block sizes for drawing to align perfectly. Since coordinates are floored,
+					// tearing shouldn't happen with exact pixel sizes.
+					game.gg.draw_rect_filled(f32(screen_x), f32(screen_y), f32(world.block_size), f32(world.block_size), color)
 				}
 			}
 		}
@@ -152,10 +153,12 @@ fn on_event(e &gg.Event, mut game Game) {
 		} else if e.mouse_button == .right {
 			// Place block
 			if game.world.get_block(world_x, world_y, 1) == 0 {
-				if game.registry.blocks[game.selected_block].is_solid {
-					game.world.set_block(world_x, world_y, 1, game.selected_block)
-				} else {
-					game.world.set_block(world_x, world_y, 0, game.selected_block)
+				if game.selected_block < game.registry.blocks.len {
+					if game.registry.blocks[game.selected_block].is_solid {
+						game.world.set_block(world_x, world_y, 1, game.selected_block)
+					} else {
+						game.world.set_block(world_x, world_y, 0, game.selected_block)
+					}
 				}
 			}
 		}
