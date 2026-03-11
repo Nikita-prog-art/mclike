@@ -136,6 +136,23 @@ fn frame(mut game Game) {
 	// Draw player
 	game.gg.draw_rect_filled(win_width / 2 - 10, win_height / 2 - 10, 20, 20, gg.Color{r: 255, g: 0, b: 0, a: 255})
 
+	// Draw ceiling (layer 2)
+	for layer in 2 .. 3 {
+		for y in start_y .. end_y {
+			for x in start_x .. end_x {
+				block_id := game.world.get_block(x, y, layer)
+				if block_id > 0 && block_id < game.registry.blocks.len {
+					color := game.registry.blocks[block_id].color
+
+					screen_x := (x * world.block_size) - camera_x
+					screen_y := (y * world.block_size) - camera_y
+
+					game.gg.draw_rect_filled(f32(screen_x), f32(screen_y), f32(world.block_size), f32(world.block_size), color)
+				}
+			}
+		}
+	}
+
 	// Draw currently selected block
 	if game.selected_block > 0 && game.selected_block < game.registry.blocks.len {
 		b_color := game.registry.blocks[game.selected_block].color
@@ -171,6 +188,7 @@ fn on_event(e &gg.Event, mut game Game) {
 
 		if e.mouse_button == .left {
 			// Mine block
+<<<<<<< feature/add-particles-12227762357414592985
 			block_id := game.world.get_block(world_x, world_y, 1)
 			if block_id > 0 {
 				color := game.registry.blocks[block_id].color
@@ -188,13 +206,19 @@ fn on_event(e &gg.Event, mut game Game) {
 						color: color
 					}
 				}
+=======
+			target_layer := if game.keys[.left_shift] || game.keys[.right_shift] { 2 } else { 1 }
+			if game.world.get_block(world_x, world_y, target_layer) > 0 {
+				game.world.set_block(world_x, world_y, target_layer, 0)
+>>>>>>> master
 			}
 		} else if e.mouse_button == .right {
 			// Place block
-			if game.world.get_block(world_x, world_y, 1) == 0 {
+			target_layer := if game.keys[.left_shift] || game.keys[.right_shift] { 2 } else { 1 }
+			if game.world.get_block(world_x, world_y, target_layer) == 0 {
 				if game.selected_block < game.registry.blocks.len {
-					if game.registry.blocks[game.selected_block].is_solid {
-						game.world.set_block(world_x, world_y, 1, game.selected_block)
+					if target_layer == 2 || game.registry.blocks[game.selected_block].is_solid {
+						game.world.set_block(world_x, world_y, target_layer, game.selected_block)
 					} else {
 						game.world.set_block(world_x, world_y, 0, game.selected_block)
 					}
