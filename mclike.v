@@ -27,11 +27,12 @@ mut:
 fn check_collision(mut game Game, x f32, y f32) bool {
 	// Player size is 20x20, centered at player_x, player_y
 	// We check the 4 corners of the player bounding box
+	// We inset the corners slightly so it doesn't snag exactly on pixel edges
 	corners := [
-		[x - 9.0, y - 9.0],
-		[x + 9.0, y - 9.0],
-		[x - 9.0, y + 9.0],
-		[x + 9.0, y + 9.0]
+		[x - 8.0, y - 8.0],
+		[x + 8.0, y - 8.0],
+		[x - 8.0, y + 8.0],
+		[x + 8.0, y + 8.0]
 	]
 
 	for corner in corners {
@@ -58,12 +59,19 @@ fn frame(mut game Game) {
 	if game.keys[.a] || game.keys[.left] { new_x -= speed }
 	if game.keys[.d] || game.keys[.right] { new_x += speed }
 
-	// Apply X movement if no collision
+	// Resolve X and Y individually to allow sliding against walls
+	// and prevent diagonal phasing through corners.
+
+	// Check X movement
 	if !check_collision(mut game, new_x, game.player_y) {
 		game.player_x = new_x
+	} else {
+		// If collision in X, stop X movement
+		new_x = game.player_x
 	}
-	// Apply Y movement if no collision
-	if !check_collision(mut game, game.player_x, new_y) {
+
+	// Check Y movement using the updated (or blocked) X position
+	if !check_collision(mut game, new_x, new_y) {
 		game.player_y = new_y
 	}
 
@@ -102,6 +110,20 @@ fn frame(mut game Game) {
 
 	// Draw player
 	game.gg.draw_rect_filled(win_width / 2 - 10, win_height / 2 - 10, 20, 20, gg.Color{r: 255, g: 0, b: 0, a: 255})
+
+	// Draw currently selected block
+	if game.selected_block > 0 && game.selected_block < game.registry.blocks.len {
+		b_color := game.registry.blocks[game.selected_block].color
+		b_name := game.registry.blocks[game.selected_block].name
+
+		game.gg.draw_rect_filled(10, 10, 40, 40, b_color)
+		game.gg.draw_rect_empty(10, 10, 40, 40, gg.Color{r:0, g:0, b:0, a:255})
+
+		game.gg.draw_text(60, 20, b_name, gg.TextCfg{
+			color: gg.Color{r:0, g:0, b:0, a:255}
+			size: 20
+		})
+	}
 
 	game.gg.end()
 }
