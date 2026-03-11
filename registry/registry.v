@@ -1,11 +1,13 @@
 module registry
 
+import gg
+
 pub struct Block {
 pub:
     id          int
     name        string
     is_solid    bool
-    color       int
+    color       gg.Color
 }
 
 pub struct BlockRegistry {
