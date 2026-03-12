@@ -5,7 +5,7 @@ jobs:
   build:
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v3
+      - uses: actions/checkout@v4
       - name: Setup V
         uses: vlang/setup-v@v1.3
         with:
@@ -21,7 +21,7 @@ jobs:
       - name: Build Android APK
         run: ~/.vmodules/bin/vab mclike.v
       - name: Upload APK
-        uses: actions/upload-artifact@v3
+        uses: actions/upload-artifact@v4
         with:
           name: mclike-android
           path: mclike.apk
