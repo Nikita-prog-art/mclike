@@ -1,0 +1,27 @@
+name: Android Build
+on: [push, pull_request]
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v3
+      - name: Setup V
+        uses: vlang/setup-v@v1.3
+        with:
+          check-latest: true
+      - name: Setup Android SDK
+        uses: android-actions/setup-android@v3
+      - name: Install dependencies
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y libxcursor-dev libxi-dev libgl1-mesa-dev libxrandr-dev libxinerama-dev openjdk-17-jdk
+      - name: Install v tools
+        run: v install vab
+      - name: Build Android APK
+        run: ~/.vmodules/bin/vab mclike.v
+      - name: Upload APK
+        uses: actions/upload-artifact@v3
+        with:
+          name: mclike-android
+          path: mclike.apk
