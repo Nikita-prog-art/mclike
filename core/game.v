@@ -248,6 +248,11 @@ pub fn on_event(e &gg.Event, mut game Game) {
 			x := t.pos_x
 			y := t.pos_y
 
+			// Skip tracking ended touches for movement flags
+			if e.typ == .touches_ended && t.changed {
+				continue
+			}
+
 			// Left
 			if x >= 20.0 && x <= 80.0 && y >= f32(wh - 160) && y <= f32(wh - 100) { game.touch_a = true }
 			// Right
@@ -332,8 +337,8 @@ pub fn on_event(e &gg.Event, mut game Game) {
 			// Allow direct screen tapping to mine/place where crosshairs are (fallback to direct touch map)
 			if !(x >= 20.0 && x <= 220.0 && y >= f32(wh - 230)) && !(x >= f32(ww - 180) && y >= f32(wh - 180)) && !(x >= f32(ww - 140) && y <= 70.0) {
 				if e.typ == .touches_began && t.changed {
-					camera_x := int(game.player_x) - win_width / 2
-					camera_y := int(game.player_y) - win_height / 2
+					camera_x := int(game.player_x) - ww / 2
+					camera_y := int(game.player_y) - wh / 2
 
 					world_x := int(x + f32(camera_x)) >> 5
 					world_y := int(y + f32(camera_y)) >> 5
