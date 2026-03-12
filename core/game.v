@@ -90,14 +90,17 @@ pub fn frame(mut game Game) {
 
 	game.gg.begin()
 
+	ww := game.gg.window_size().width
+	wh := game.gg.window_size().height
+
 	// Draw world
-	camera_x := int(game.player_x) - win_width / 2
-	camera_y := int(game.player_y) - win_height / 2
+	camera_x := int(game.player_x) - ww / 2
+	camera_y := int(game.player_y) - wh / 2
 
 	start_x := (camera_x >> 5) - 1
 	start_y := (camera_y >> 5) - 1
-	end_x := start_x + (win_width / world.block_size) + 3
-	end_y := start_y + (win_height / world.block_size) + 3
+	end_x := start_x + (ww / world.block_size) + 3
+	end_y := start_y + (wh / world.block_size) + 3
 
 	for layer in 0 .. 2 {
 		for y in start_y .. end_y {
@@ -132,7 +135,7 @@ pub fn frame(mut game Game) {
 	game.particles = next_particles
 
 	// Draw player
-	game.gg.draw_rect_filled(win_width / 2 - 10, win_height / 2 - 10, 20, 20, gg.Color{r: 255, g: 0, b: 0, a: 255})
+	game.gg.draw_rect_filled(f32(ww) / 2.0 - 10.0, f32(wh) / 2.0 - 10.0, 20, 20, gg.Color{r: 255, g: 0, b: 0, a: 255})
 
 	// Draw currently selected block
 	if game.selected_block > 0 && game.selected_block < game.registry.blocks.len {
@@ -149,9 +152,6 @@ pub fn frame(mut game Game) {
 	}
 
 	$if android {
-		ww := game.gg.window_size().width
-		wh := game.gg.window_size().height
-
 		// D-Pad (left side)
 		game.gg.draw_rect_filled(20, f32(wh - 160), 60, 60, gg.Color{r: 200, g: 200, b: 200, a: 128}) // left
 		game.gg.draw_rect_filled(160, f32(wh - 160), 60, 60, gg.Color{r: 200, g: 200, b: 200, a: 128}) // right
@@ -180,8 +180,10 @@ pub fn on_event(e &gg.Event, mut game Game) {
 	} else if e.typ == .key_up {
 		game.keys[e.key_code] = false
 	} else if e.typ == .mouse_down {
-		camera_x := int(game.player_x) - win_width / 2
-		camera_y := int(game.player_y) - win_height / 2
+		ww := game.gg.window_size().width
+		wh := game.gg.window_size().height
+		camera_x := int(game.player_x) - ww / 2
+		camera_y := int(game.player_y) - wh / 2
 
 		world_x := int(e.mouse_x + f32(camera_x)) >> 5
 		world_y := int(e.mouse_y + f32(camera_y)) >> 5
