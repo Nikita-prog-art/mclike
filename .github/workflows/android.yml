@@ -20,8 +20,10 @@ jobs:
         run: |
           v install vab
           v run ~/.vmodules/vab/vab.v install ndk
+          yes | sdkmanager "platforms;android-29"
+          sed -i 's/-cc clang/-cc gcc/g' ~/.vmodules/vab/android/compile.v
       - name: Build Android APK
-        run: v run ~/.vmodules/vab/vab.v mclike.v
+        run: v run ~/.vmodules/vab/vab.v mclike.v -o mclike.apk
       - name: Upload APK
         uses: actions/upload-artifact@v4
         with:
