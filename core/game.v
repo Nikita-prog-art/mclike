@@ -247,8 +247,11 @@ pub fn on_event(e &gg.Event, mut game Game) {
 
 		for i in 0 .. e.num_touches {
 			t := e.touches[i]
-			x := t.pos_x
-			y := t.pos_y
+
+			// sapp touch coordinates are in physical pixels, we need to divide by DPI scale to match gg logical pixels
+			scale := game.gg.scale
+			x := t.pos_x / scale
+			y := t.pos_y / scale
 
 			// Skip tracking ended touches for movement flags
 			if e.typ == .touches_ended && t.changed {
