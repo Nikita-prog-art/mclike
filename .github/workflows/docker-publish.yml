@@ -25,5 +25,5 @@ jobs:
           context: .
           push: true
           # Образ будет называться: ghcr.io/имя_владельца/имя_репозитория:latest
-          tags: ghcr.io/${{ github.repository_owner }}/${{ github.event.repository.name }}:latest
+          tags: ghcr.io/nikita-prog-art/${{ github.event.repository.name }}:latest
 
