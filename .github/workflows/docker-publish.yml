@@ -3,7 +3,7 @@ name: Build and Publish Docker Image
 on:
   push:
     paths:
-      - 'Dockerfile' # Собираем образ заново, только если изменился Dockerfile
+      - 'Dockerfile' # Собираем образ заново, только если изменился Dockerfile #
   workflow_dispatch: # Позволяет запустить сборку вручную из интерфейса GitHub
 
 jobs:
