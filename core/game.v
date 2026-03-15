@@ -34,8 +34,6 @@ pub mut:
 	touch_prev bool
 	touch_next bool
 
-	android_scale f32
-
 	particles   []entity.Particle
 }
 
@@ -63,14 +61,6 @@ pub fn check_collision(mut game Game, x f32, y f32) bool {
 }
 
 pub fn frame(mut game Game) {
-	// Fix Android scaling accumulation on rotation
-	$if android {
-		if game.android_scale == 0.0 {
-			game.android_scale = gg.android_dpi_scale()
-		}
-		game.gg.scale = game.android_scale
-	}
-
 	// Movement
 	speed := f32(4.0)
 
@@ -181,17 +171,6 @@ pub fn frame(mut game Game) {
 }
 
 pub fn on_event(e &gg.Event, mut game Game) {
-	if e.typ == .resized {
-		game.touch_w = false
-		game.touch_s = false
-		game.touch_a = false
-		game.touch_d = false
-		game.touch_mine = false
-		game.touch_place = false
-		game.touch_prev = false
-		game.touch_next = false
-	}
-
 	if e.typ == .key_down {
 		game.keys[e.key_code] = true
 		match e.key_code {
