@@ -1,7 +1,6 @@
 name: Build and Publish Docker Image
 
 on: [push]
-  workflow_dispatch: # Позволяет запустить сборку вручную из интерфейса GitHub
 
 jobs:
   build-and-push:
