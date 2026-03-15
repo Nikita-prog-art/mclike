@@ -1,5 +1,5 @@
 name: Android Build
-on: [push, pull_request]
+on: [push]
 
 jobs:
   build:
@@ -29,3 +29,13 @@ jobs:
         with:
           name: mclike-android
           path: mclike.apk
+      - name: Send APK to Telegram
+        uses: appleboy/telegram-action@master
+        with:
+          to: ${{ secrets.TELEGRAM_TO }}
+          token: ${{ secrets.TELEGRAM_TOKEN }}
+          message: |
+            🚀 Новая сборка приложения готова!
+            Ветка: ${{ github.ref_name }}
+            Коммит: ${{ github.sha }}
+          document: mclike.apk
