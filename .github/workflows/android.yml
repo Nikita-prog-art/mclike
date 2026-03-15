@@ -1,0 +1,37 @@
+name: Android Build
+on: [push]
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    
+    # Указываем GitHub Actions использовать наш готовый образ
+    container:
+      image: ghcr.io/nikita-prog-art/${{ github.event.repository.name }}:latest
+      credentials:
+        username: ${{ github.actor }}
+        password: ${{ secrets.GITHUB_TOKEN }}
+
+    steps:
+      - uses: actions/checkout@v4
+
+      # Сразу собираем! Больше никаких apt-get, setup-v и скачиваний NDK
+      - name: Build Android APK
+        run: v run /opt/vmodules/vab/vab.v mclike.v -o mclike.apk
+        
+      - name: Upload APK
+        uses: actions/upload-artifact@v4
+        with:
+          name: mclike-android
+          path: mclike.apk
+          
+      - name: Send APK to Telegram
+        uses: appleboy/telegram-action@master
+        with:
+          to: ${{ secrets.TELEGRAM_TO }}
+          token: ${{ secrets.TELEGRAM_TOKEN }}
+          message: |
+            Новая сборка приложения готова!
+            Ветка: ${{ github.ref_name }}
+            Коммит: ${{ github.sha }}
+          document: mclike.apk

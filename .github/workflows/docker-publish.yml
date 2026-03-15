@@ -1,0 +1,29 @@
+name: Build and Publish Docker Image
+
+on: [push]
+
+jobs:
+  build-and-push:
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+      packages: write # Даем права на запись в реестр пакетов
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Log in to GitHub Container Registry
+        uses: docker/login-action@v3
+        with:
+          registry: ghcr.io
+          username: ${{ github.actor }}
+          password: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Build and push Docker image
+        uses: docker/build-push-action@v5
+        with:
+          context: .
+          push: true
+          # Образ будет называться: ghcr.io/имя_владельца/имя_репозитория:latest
+          tags: ghcr.io/nikita-prog-art/${{ github.event.repository.name }}:latest
+
